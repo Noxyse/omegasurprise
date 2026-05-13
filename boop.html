@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Renardeaux ♥</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rose: #e8738a;
+      --blush: #f9d0da;
+      --cream: #fff8f4;
+      --deep: #3a1a22;
+      --gold: #d4956a;
+      --soft: #f3e8ec;
+    }
+
+    body {
+      background: var(--cream);
+      font-family: 'Lato', sans-serif;
+      color: var(--deep);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px 60px;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 15% 15%, #fce4ec66 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, #ffe0b266 0%, transparent 45%),
+        radial-gradient(circle at 60% 30%, #f8bbd044 0%, transparent 35%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    /* ── TITLE ── */
+    .page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-style: italic;
+      color: var(--rose);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .page-subtitle {
+      font-size: 0.8rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #c9899a;
+      text-align: center;
+      margin-top: -12px;
+      margin-bottom: 8px;
+    }
+
+    .divider {
+      width: 60px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--rose), transparent);
+      border-radius: 2px;
+      margin-bottom: 8px;
+    }
+
+    /* ── BUTTONS ── */
+    .main-btn {
+      width: 100%;
+      padding: 18px 32px;
+      border-radius: 60px;
+      border: none;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .main-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.15);
+      opacity: 0;
+      transition: opacity 0.18s;
+    }
+
+    .main-btn:hover { transform: translateY(-3px); }
+    .main-btn:hover::after { opacity: 1; }
+    .main-btn:active { transform: translateY(0); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--rose), var(--gold));
+      color: #fff;
+      box-shadow: 0 6px 24px rgba(232,115,138,0.35);
+    }
+    .btn-primary:hover { box-shadow: 0 10px 32px rgba(232,115,138,0.45); }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--deep);
+      border: 2px solid var(--blush);
+      box-shadow: 0 4px 16px rgba(232,115,138,0.12);
+    }
+    .btn-secondary:hover { box-shadow: 0 8px 24px rgba(232,115,138,0.2); border-color: var(--rose); }
+
+    /* ── PRESENT OVERLAY ── */
+    .present-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(58,26,34,0.5);
+      backdrop-filter: blur(6px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 28px;
+    }
+    .present-overlay.open { display: flex; }
+
+    .present-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    /* Present SVG animation */
+    .present-svg {
+      width: 120px;
+      height: 120px;
+      cursor: pointer;
+    }
+
+    .present-lid {
+      transform-origin: center bottom;
+      animation: none;
+    }
+
+    .present-overlay.opening .present-lid {
+      animation: liftLid 0.6s ease forwards;
+    }
+
+    @keyframes liftLid {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+      60%  { transform: translateY(-40px) rotate(-15deg); opacity: 1; }
+      100% { transform: translateY(-60px) rotate(-20deg); opacity: 0; }
+    }
+
+    /* Sparkles */
+    .sparkles {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      pointer-events: none;
+      opacity: 0;
+    }
+    .present-overlay.opening .sparkles {
+      animation: fadeSparkles 0.8s ease 0.4s forwards;
+    }
+    @keyframes fadeSparkles {
+      0%   { opacity: 0; transform: scale(0.5); }
+      50%  { opacity: 1; transform: scale(1.3); }
+      100% { opacity: 0; transform: scale(1.6); }
+    }
+
+    /* Revealed image */
+    .reveal-img-wrap {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    @keyframes popIn {
+      0%   { opacity: 0; transform: scale(0.7); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .reveal-img-placeholder {
+      width: 280px;
+      height: 200px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--blush), #ffe8cd);
+      border: 2px dashed var(--rose);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--rose);
+    }
+    .reveal-img-placeholder svg { width: 40px; height: 40px; }
+    .reveal-img-placeholder span { font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 300; }
+
+    .reveal-img-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 14px;
+    }
+
+    .close-btn {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      color: #fff;
+      border-radius: 30px;
+      padding: 10px 28px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .close-btn:hover { background: rgba(255,255,255,0.35); }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+
+    <h1 class="page-title">Renardeaux ♥</h1>
+    <p class="page-subtitle">Bienvenue !</p>
+    <div class="divider"></div>
+
+    <!-- Hall of Fame -->
+    <a href="https://www.kudoboard.com" target="_blank" style="width:100%; text-decoration:none;">
+      <button class="main-btn btn-primary">🏆 Hall of Fame</button>
+    </a>
+
+    <!-- Present buttons -->
+    <button class="main-btn btn-secondary" onclick="openPresent('present1')">🎁 Ouvre moi !</button>
+    <button class="main-btn btn-secondary" onclick="openPresent('present2')">🎁 Moi aussi !</button>
+    <button class="main-btn btn-secondary" onclick="openPresent('present3')">🎁 Hey, ne m'oublie pas, hein !</button>
+
+    <!-- Birthday subpage button -->
+    <div class="divider" style="margin-top:8px;"></div>
+    <a href="birthday.html" style="width:100%; text-decoration:none;">
+      <button class="main-btn btn-secondary" style="font-size:0.85rem; padding:14px 32px;">🦊 Set Fuwawa Abyssgard Birthday 2026</button>
+    </a>
+
+  </div>
+
+  <!-- PRESENT OVERLAY -->
+  <div class="present-overlay" id="present-overlay" onclick="overlayClick(event)">
+    <div class="present-box" id="present-box">
+
+      <!-- Present SVG (shown before opening) -->
+      <div style="position:relative; display:flex; align-items:center; justify-content:center;" id="present-anim">
+        <!-- Sparkles -->
+        <svg class="sparkles" viewBox="0 0 120 120" id="sparkles-svg">
+          <text x="10" y="30" font-size="18">✨</text>
+          <text x="80" y="20" font-size="14">⭐</text>
+          <text x="90" y="80" font-size="18">✨</text>
+          <text x="5"  y="90" font-size="14">⭐</text>
+          <text x="50" y="10" font-size="12">💫</text>
+        </svg>
+
+        <!-- Present -->
+        <svg class="present-svg" viewBox="0 0 120 120" id="present-svg" onclick="triggerOpen()" xmlns="http://www.w3.org/2000/svg">
+          <!-- Box body -->
+          <rect x="15" y="55" width="90" height="55" rx="6" fill="#f9d0da" stroke="#e8738a" stroke-width="2.5"/>
+          <!-- Ribbon vertical -->
+          <rect x="52" y="55" width="16" height="55" fill="#e8738a" opacity="0.5"/>
+          <!-- Ribbon horizontal on box -->
+          <rect x="15" y="75" width="90" height="12" fill="#e8738a" opacity="0.5"/>
+
+          <!-- Lid group (animated) -->
+          <g class="present-lid" id="present-lid">
+            <rect x="10" y="40" width="100" height="20" rx="5" fill="#f9d0da" stroke="#e8738a" stroke-width="2.5"/>
+            <!-- Ribbon on lid -->
+            <rect x="52" y="40" width="16" height="20" fill="#e8738a" opacity="0.5"/>
+            <!-- Bow left loop -->
+            <ellipse cx="48" cy="38" rx="16" ry="10" fill="#e8738a" transform="rotate(-20 48 38)"/>
+            <!-- Bow right loop -->
+            <ellipse cx="72" cy="38" rx="16" ry="10" fill="#e8738a" transform="rotate(20 72 38)"/>
+            <!-- Bow center -->
+            <circle cx="60" cy="40" r="7" fill="#d4956a"/>
+          </g>
+        </svg>
+      </div>
+
+      <p style="color:#fff; font-family:'Playfair Display',serif; font-style:italic; font-size:1rem; opacity:0.85;" id="present-hint">Clique sur le cadeau pour l'ouvrir !</p>
+
+      <!-- Revealed image (shown after opening) -->
+      <div class="reveal-img-wrap" id="reveal-img-wrap">
+        <div class="reveal-img-placeholder" id="reveal-img-inner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="3" width="18" height="18" rx="3"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <path d="M21 15l-5-5L5 21"/>
+          </svg>
+          <span>Votre image ici</span>
+        </div>
+      </div>
+
+      <button class="close-btn" onclick="closePresent()">Fermer ✕</button>
+    </div>
+  </div>
+
+  <script>
+    // Config: add your image src for each present here
+    const presents = {
+      present1: { img: '', label: 'Ouvre moi !' },
+      present2: { img: '', label: 'Moi aussi !' },
+      present3: { img: '', label: 'Hey, ne m\'oublie pas, hein !' },
+    };
+
+    let currentPresent = null;
+    let opened = false;
+
+    function openPresent(id) {
+      currentPresent = id;
+      opened = false;
+      const overlay = document.getElementById('present-overlay');
+      const lid = document.getElementById('present-lid');
+      const revealWrap = document.getElementById('reveal-img-wrap');
+      const hint = document.getElementById('present-hint');
+      const presentAnim = document.getElementById('present-anim');
+
+      // Reset state
+      overlay.classList.remove('opening');
+      lid.style.opacity = '1';
+      lid.style.transform = '';
+      revealWrap.style.display = 'none';
+      hint.style.display = 'block';
+      presentAnim.style.display = 'flex';
+      hint.textContent = 'Clique sur le cadeau pour l\'ouvrir !';
+
+      overlay.classList.add('open');
+    }
+
+    function triggerOpen() {
+      if (opened) return;
+      opened = true;
+
+      const overlay   = document.getElementById('present-overlay');
+      const revealWrap = document.getElementById('reveal-img-wrap');
+      const hint      = document.getElementById('present-hint');
+      const presentAnim = document.getElementById('present-anim');
+      const inner     = document.getElementById('reveal-img-inner');
+
+      // Trigger lid animation
+      overlay.classList.add('opening');
+
+      setTimeout(() => {
+        // Hide present, show image
+        presentAnim.style.display = 'none';
+        hint.style.display = 'none';
+
+        // Set image content
+        const p = presents[currentPresent];
+        if (p && p.img) {
+          inner.innerHTML = `<img src="${p.img}" alt="${p.label}" />`;
+          inner.style.background = 'none';
+          inner.style.border = 'none';
+        } else {
+          inner.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="3" width="18" height="18" rx="3"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <path d="M21 15l-5-5L5 21"/>
+            </svg>
+            <span>Votre image ici</span>`;
+        }
+
+        revealWrap.style.display = 'flex';
+      }, 900);
+    }
+
+    function closePresent() {
+      document.getElementById('present-overlay').classList.remove('open', 'opening');
+      currentPresent = null;
+    }
+
+    function overlayClick(e) {
+      if (e.target === e.currentTarget) closePresent();
+    }
+  </script>
+</body>
+</html>
