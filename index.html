@@ -145,7 +145,6 @@
       gap: 24px;
     }
 
-    /* Present SVG animation */
     .present-svg {
       width: 120px;
       height: 120px;
@@ -167,7 +166,6 @@
       100% { transform: translateY(-60px) rotate(-20deg); opacity: 0; }
     }
 
-    /* Sparkles */
     .sparkles {
       position: absolute;
       width: 120px;
@@ -184,7 +182,6 @@
       100% { opacity: 0; transform: scale(1.6); }
     }
 
-    /* Revealed image */
     .reveal-img-wrap {
       display: none;
       flex-direction: column;
@@ -232,6 +229,102 @@
       transition: background 0.2s;
     }
     .close-btn:hover { background: rgba(255,255,255,0.35); }
+
+    /* ── CONTRIBUTORS OVERLAY ── */
+    .contributors-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(58,26,34,0.5);
+      backdrop-filter: blur(6px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .contributors-overlay.open { display: flex; }
+
+    .contributors-box {
+      background: var(--cream);
+      border-radius: 24px;
+      padding: 36px 32px;
+      width: 90%;
+      max-width: 480px;
+      max-height: 80vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      box-shadow: 0 20px 60px rgba(58,26,34,0.25);
+    }
+
+    .contributors-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-style: italic;
+      color: var(--rose);
+      text-align: center;
+    }
+
+    .contributors-grid {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .contributor-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .contributor-avatar {
+      width: 56px;
+      height: 56px;
+      min-width: 56px;
+      min-height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blush), #ffe8cd);
+      border: 2px dashed var(--rose);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--rose);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .contributor-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .contributor-avatar svg { width: 22px; height: 22px; }
+
+    .contributor-name {
+      font-size: 0.72rem;
+      font-family: 'Lato', sans-serif;
+      color: #c9899a;
+      text-align: center;
+      max-width: 68px;
+      word-break: break-word;
+    }
+
+    .contributors-close {
+      background: linear-gradient(135deg, var(--rose), var(--gold));
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      padding: 10px 28px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .contributors-close:hover { opacity: 0.85; }
   </style>
 </head>
 <body>
@@ -250,6 +343,10 @@
     <button class="main-btn btn-secondary" onclick="openPresent('present1')">🎁 Ouvre moi !</button>
     <button class="main-btn btn-secondary" onclick="openPresent('present2')">🎁 Moi aussi !</button>
     <button class="main-btn btn-secondary" onclick="openPresent('present3')">🎁 Hey, ne m'oublie pas, hein !</button>
+    <button class="main-btn btn-secondary" onclick="openPresent('present4')" style="font-style:italic;">🎁 Le meilleur pour la fin...</button>
+
+    <!-- Contributors button — hidden until present4 is opened -->
+    <button class="main-btn btn-secondary" id="contributors-btn" style="display:none;" onclick="openContributors()">💝 Les contributeurs</button>
 
     <!-- Birthday subpage button -->
     <div class="divider" style="margin-top:8px;"></div>
@@ -263,9 +360,7 @@
   <div class="present-overlay" id="present-overlay" onclick="overlayClick(event)">
     <div class="present-box" id="present-box">
 
-      <!-- Present SVG (shown before opening) -->
       <div style="position:relative; display:flex; align-items:center; justify-content:center;" id="present-anim">
-        <!-- Sparkles -->
         <svg class="sparkles" viewBox="0 0 120 120" id="sparkles-svg">
           <text x="10" y="30" font-size="18">✨</text>
           <text x="80" y="20" font-size="14">⭐</text>
@@ -274,25 +369,15 @@
           <text x="50" y="10" font-size="12">💫</text>
         </svg>
 
-        <!-- Present -->
         <svg class="present-svg" viewBox="0 0 120 120" id="present-svg" onclick="triggerOpen()" xmlns="http://www.w3.org/2000/svg">
-          <!-- Box body -->
           <rect x="15" y="55" width="90" height="55" rx="6" fill="#f9d0da" stroke="#e8738a" stroke-width="2.5"/>
-          <!-- Ribbon vertical -->
           <rect x="52" y="55" width="16" height="55" fill="#e8738a" opacity="0.5"/>
-          <!-- Ribbon horizontal on box -->
           <rect x="15" y="75" width="90" height="12" fill="#e8738a" opacity="0.5"/>
-
-          <!-- Lid group (animated) -->
           <g class="present-lid" id="present-lid">
             <rect x="10" y="40" width="100" height="20" rx="5" fill="#f9d0da" stroke="#e8738a" stroke-width="2.5"/>
-            <!-- Ribbon on lid -->
             <rect x="52" y="40" width="16" height="20" fill="#e8738a" opacity="0.5"/>
-            <!-- Bow left loop -->
             <ellipse cx="48" cy="38" rx="16" ry="10" fill="#e8738a" transform="rotate(-20 48 38)"/>
-            <!-- Bow right loop -->
             <ellipse cx="72" cy="38" rx="16" ry="10" fill="#e8738a" transform="rotate(20 72 38)"/>
-            <!-- Bow center -->
             <circle cx="60" cy="40" r="7" fill="#d4956a"/>
           </g>
         </svg>
@@ -300,7 +385,6 @@
 
       <p style="color:#fff; font-family:'Playfair Display',serif; font-style:italic; font-size:1rem; opacity:0.85;" id="present-hint">Clique sur le cadeau pour l'ouvrir !</p>
 
-      <!-- Revealed image (shown after opening) -->
       <div class="reveal-img-wrap" id="reveal-img-wrap">
         <div class="reveal-img-placeholder" id="reveal-img-inner">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -316,12 +400,74 @@
     </div>
   </div>
 
+  <!-- CONTRIBUTORS OVERLAY -->
+  <div class="contributors-overlay" id="contributors-overlay">
+    <div class="contributors-box">
+      <h2 class="contributors-title">💝 Les contributeurs</h2>
+      <div class="divider" style="margin:0;"></div>
+
+      <div class="contributors-grid">
+
+        <!-- Copy and repeat this block for each contributor -->
+        <!-- <div class="contributor-wrap">
+          <div class="contributor-avatar">
+            <img src="YourImage.png" alt="Name" />
+          </div>
+          <p class="contributor-name">Username</p>
+        </div> -->
+
+        <!-- CONTRIBUTOR 1 -->
+        <div class="contributor-wrap">
+          <div class="contributor-avatar">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+          </div>
+          <p class="contributor-name">Username</p>
+        </div>
+
+        <!-- CONTRIBUTOR 2 -->
+        <div class="contributor-wrap">
+          <div class="contributor-avatar">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+          </div>
+          <p class="contributor-name">Username</p>
+        </div>
+
+        <!-- CONTRIBUTOR 3 -->
+        <div class="contributor-wrap">
+          <div class="contributor-avatar">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+          </div>
+          <p class="contributor-name">Username</p>
+        </div>
+
+        <!-- CONTRIBUTOR 4 -->
+        <div class="contributor-wrap">
+          <div class="contributor-avatar">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+          </div>
+          <p class="contributor-name">Username</p>
+        </div>
+
+        <!-- CONTRIBUTOR 5 -->
+        <div class="contributor-wrap">
+          <div class="contributor-avatar">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+          </div>
+          <p class="contributor-name">Username</p>
+        </div>
+
+      </div>
+
+      <button class="contributors-close" onclick="closeContributors()">Fermer ✕</button>
+    </div>
+  </div>
+
   <script>
-    // Config: add your image src for each present here
     const presents = {
       present1: { img: 'rode.jpg', label: 'Ouvre moi !' },
       present2: { img: 'bras.jpg', label: 'Moi aussi !' },
       present3: { img: 'focusrite.webp', label: 'Hey, ne m\'oublie pas, hein !' },
+      present4: { img: '', label: 'Le meilleur pour la fin...' },
     };
 
     let currentPresent = null;
@@ -336,7 +482,6 @@
       const hint = document.getElementById('present-hint');
       const presentAnim = document.getElementById('present-anim');
 
-      // Reset state
       overlay.classList.remove('opening');
       lid.style.opacity = '1';
       lid.style.transform = '';
@@ -352,21 +497,18 @@
       if (opened) return;
       opened = true;
 
-      const overlay   = document.getElementById('present-overlay');
+      const overlay    = document.getElementById('present-overlay');
       const revealWrap = document.getElementById('reveal-img-wrap');
-      const hint      = document.getElementById('present-hint');
+      const hint       = document.getElementById('present-hint');
       const presentAnim = document.getElementById('present-anim');
-      const inner     = document.getElementById('reveal-img-inner');
+      const inner      = document.getElementById('reveal-img-inner');
 
-      // Trigger lid animation
       overlay.classList.add('opening');
 
       setTimeout(() => {
-        // Hide present, show image
         presentAnim.style.display = 'none';
         hint.style.display = 'none';
 
-        // Set image content
         const p = presents[currentPresent];
         if (p && p.img) {
           inner.innerHTML = `<img src="${p.img}" alt="${p.label}" />`;
@@ -388,12 +530,27 @@
 
     function closePresent() {
       document.getElementById('present-overlay').classList.remove('open', 'opening');
+      if (currentPresent === 'present4') {
+        document.getElementById('contributors-btn').style.display = 'block';
+      }
       currentPresent = null;
     }
 
     function overlayClick(e) {
       if (e.target === e.currentTarget) closePresent();
     }
+
+    function openContributors() {
+      document.getElementById('contributors-overlay').classList.add('open');
+    }
+
+    function closeContributors() {
+      document.getElementById('contributors-overlay').classList.remove('open');
+    }
+
+    document.getElementById('contributors-overlay').addEventListener('click', function(e) {
+      if (e.target === this) closeContributors();
+    });
   </script>
 </body>
 </html>
